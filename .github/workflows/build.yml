@@ -33,7 +33,7 @@ jobs:
 
       # 如果你没有提交 package-lock.json，请把 npm ci 改成 npm install
       - name: Install dependencies
-        run: npm ci
+        run: npm install
 
       - name: Start Database Services
         run: docker compose up -d
