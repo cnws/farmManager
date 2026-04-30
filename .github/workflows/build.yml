@@ -45,9 +45,10 @@ jobs:
         run: npm run db:migrate
 
       - name: Populate database with seed data
-       run: |
+        run: |
           # 执行作者最新重构后的初始化脚本
           npx tsx src/scripts/init-db.ts  
+          # 注意：如果该文件不在 src 目录下，请改为 npx tsx scripts/init-db.ts
 
       # 增加编译步骤：将 TypeScript 编译成 JavaScript
       - name: Build project
