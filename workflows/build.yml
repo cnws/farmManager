@@ -1,0 +1,69 @@
+name: Node.js CI Build
+
+# 触发条件：当代码推送到 main 分支，或向 main 分支提交 Pull Request 时触发
+on:
+  push:
+    branches:[ "main", "master" ]
+  pull_request:
+    branches: [ "main", "master" ]
+
+jobs:
+  build-and-test:
+    runs-on: ubuntu-latest
+
+    steps:
+      # 1. 拉取仓库代码 (相当于 git clone)
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      # 2. 配置 Node.js 环境
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20' # 建议使用当前主流 LTS 版本，可根据你的项目实际情况修改(如 '18')
+          cache: 'npm'       # 自动缓存 npm 依赖，加快后续运行速度
+
+      # 3. 设置环境变量 (重要)
+      # 如果你的项目依赖 .env 文件来连接数据库，可以在这里生成。
+      # 如果仓库中有 .env.example，通常的做法是复制它。
+      - name: Setup Environment Variables
+        run: |
+          if [ -f ".env.example" ]; then
+            cp .env.example .env
+          fi
+          # 如果有敏感环境变量，请在 GitHub 仓库设置 Secrets，并在此处引入，例如：
+          # echo "DB_PASSWORD=${{ secrets.DB_PASSWORD }}" >> .env
+
+      # 4. 安装项目依赖 (相当于 npm install)
+      - name: Install dependencies
+        run: npm ci # 在 CI 环境中推荐使用 npm ci，如果有 package-lock.json 的话；否则可替换为 npm install
+
+      # 5. 启动数据库 (相当于 docker-compose up -d)
+      - name: Start Database Services
+        run: docker compose up -d
+
+      # 6. 等待数据库启动就绪
+      # 数据库容器启动后，内部的服务(如 MySQL/PostgreSQL)通常需要几秒钟时间才能接受连接
+      - name: Wait for database to be ready
+        run: sleep 10 # 如果你的迁移脚本经常报"拒绝连接"错误，可以把这里的等待时间调长一点
+
+      # 7. 执行数据库迁移
+      - name: Run Database Migrations
+        run: npm run db:migrate
+
+      # 8. 填充初始数据
+      - name: Populate database with seed data
+        run: |
+          npx tsx src/scripts/seed_items.ts
+          npx tsx src/scripts/010_add_silo_inventory.ts
+          npx tsx src/scripts/011_create_market_prices.ts
+          npx tsx src/scripts/012_update_lands_condition_constraint.ts
+
+      # 9. 编译代码/运行测试 (替代 npm run dev)
+      # 因为 `npm run dev` 会一直挂起等待请求，这会导致 CI 任务一直卡住超时。
+      # 我们通常在 CI 里运行 build 或 test 来验证代码是否正确。
+      - name: Build project
+        run: |
+          # 如果你的 package.json 中有 build 脚本（比如 tsc 编译），请取消下面这行的注释
+          # npm run build
+          echo "Database setup and scripts executed successfully!"
