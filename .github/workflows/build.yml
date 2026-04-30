@@ -46,9 +46,13 @@ jobs:
 
       - name: Populate database with seed data
         run: |
-          # 执行作者最新重构后的初始化脚本
-          npx tsx src/scripts/init-db.ts  
-          # 注意：如果该文件不在 src 目录下，请改为 npx tsx scripts/init-db.ts
+          # （可选排错）列出项目根目录和 scripts 目录下的内容，如果又报错了可以在日志里看它到底在哪
+          ls -la
+          ls -la scripts/ || true
+          ls -la src/scripts/ || true
+          
+          # 执行正确的路径（去掉了 src/）
+          npx tsx scripts/init-db.ts
 
       # 增加编译步骤：将 TypeScript 编译成 JavaScript
       - name: Build project
