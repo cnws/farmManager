@@ -45,11 +45,9 @@ jobs:
         run: npm run db:migrate
 
       - name: Populate database with seed data
-        run: |
-          npx tsx src/scripts/seed_items.ts
-          npx tsx src/scripts/010_add_silo_inventory.ts
-          npx tsx src/scripts/011_create_market_prices.ts
-          # npx tsx src/scripts/012_update_lands_condition_constraint.ts
+       run: |
+          # 执行作者最新重构后的初始化脚本
+          npx tsx src/scripts/init-db.ts  
 
       # 增加编译步骤：将 TypeScript 编译成 JavaScript
       - name: Build project
