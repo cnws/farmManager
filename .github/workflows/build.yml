@@ -56,7 +56,18 @@ jobs:
 
       # 增加编译步骤：将 TypeScript 编译成 JavaScript
       - name: Build project
-        run: npm run build
+        run: |
+          npm run build
+          echo "打包完成！查看当前目录生成了哪些文件夹："
+          ls -la
+
+      - name: Upload Build Artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: farm-manager-dist
+          # 👇 这里的路径非常关键！
+          path: dist/     
+          # 如果你的项目生成的是 build 文件夹，请改成 build/ ；如果是 .next 文件夹，请改成 .next/
 
       # 将编译后的产物上传为 Artifact
       - name: Upload Build Artifacts
