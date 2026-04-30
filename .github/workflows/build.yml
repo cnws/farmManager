@@ -64,10 +64,13 @@ jobs:
       - name: Upload Build Artifacts
         uses: actions/upload-artifact@v4
         with:
-          name: farm-manager-dist
-          # 👇 这里的路径非常关键！
-          path: dist/     
-          # 如果你的项目生成的是 build 文件夹，请改成 build/ ；如果是 .next 文件夹，请改成 .next/
+          name: farm-manager-build   # 下载下来的压缩包名字
+          # 👇 支持多行路径，把 Next.js 运行所需的核心文件都打包下载
+          path: |
+            .next/
+            public/
+            package.json
+            package-lock.json
 
       # 将编译后的产物上传为 Artifact
       - name: Upload Build Artifacts
