@@ -49,7 +49,7 @@ jobs:
           npx tsx src/scripts/seed_items.ts
           npx tsx src/scripts/010_add_silo_inventory.ts
           npx tsx src/scripts/011_create_market_prices.ts
-          npx tsx src/scripts/012_update_lands_condition_constraint.ts
+          # npx tsx src/scripts/012_update_lands_condition_constraint.ts
 
       # 增加编译步骤：将 TypeScript 编译成 JavaScript
       - name: Build project
